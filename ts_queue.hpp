@@ -49,28 +49,58 @@ TSQueue<T>::TSQueue() : TSQueue(DEFAULT_BUFFER_SIZE) {
 }
 
 template <class T>
-TSQueue<T>::TSQueue(int buffer_size) : buffer_size(buffer_size) {
-	// TODO: implements TSQueue constructor
+TSQueue<T>::TSQueue(int buffer_size) : buffer_size(buffer_size), size(0), head(0), tail(0) {
+	// TODO: implements TSQueue constructor (Done)
+    pthread_mutex_init(&mutex, nullptr);
+    pthread_cond_init(&cond_enqueue, nullptr);
+    pthread_cond_init(&cond_dequeue, nullptr);
 }
 
 template <class T>
 TSQueue<T>::~TSQueue() {
-	// TODO: implenents TSQueue destructor
+	// TODO: implenents TSQueue destructor (Done)
+    delete[] buffer;
+    pthread_mutex_destroy(&mutex);
+    pthread_cond_destroy(&cond_enqueue);
+    pthread_cond_destroy(&cond_dequeue);
 }
 
 template <class T>
 void TSQueue<T>::enqueue(T item) {
-	// TODO: enqueues an element to the end of the queue
+	// TODO: enqueues an element to the end of the queue (Done)
+    pthread_mutex_lock(&mutex);
+    while (size == buffer_size) {
+        pthread_cond_wait(&cond_enqueue, &mutex);
+    }
+    buffer[tail] = item;
+    tail = (tail + 1) % buffer_size;
+    size++;
+    pthread_cond_signal(&cond_dequeue); // signal dequeue
+    pthread_mutex_unlock(&mutex);
 }
 
 template <class T>
 T TSQueue<T>::dequeue() {
-	// TODO: dequeues the first element of the queue
+	// TODO: dequeues the first element of the queue (Done)
+    pthread_mutex_lock(&mutex);
+    while (size == 0) {
+        pthread_cond_wait(&cond_dequeue, &mutex);
+    }
+    T item = buffer[head];
+    head = (head + 1) % buffer_size;
+    size--;
+    pthread_cond_signal(&cond_enqueue); // signal enqueue
+    pthread_mutex_unlock(&mutex);
+    return item;
 }
 
 template <class T>
 int TSQueue<T>::get_size() {
-	// TODO: returns the size of the queue
+	// TODO: returns the size of the queue (Done)
+    pthread_mutex_lock(&mutex);
+    int res = size;
+    pthread_mutex_unlock(&mutex);
+    return res;
 }
 
 #endif // TS_QUEUE_HPP
