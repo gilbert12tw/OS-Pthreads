@@ -1,5 +1,5 @@
-CXX = g++-14
-CXXFLAGS = -std=c++11 -O3 -g
+CXX = g++
+CXXFLAGS = -static -std=c++11 -O3 -g
 LDFLAGS = -pthread
 TARGETS = main reader_test producer_test consumer_test writer_test ts_queue_test
 DEPS = transformer.cpp
