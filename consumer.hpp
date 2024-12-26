@@ -46,7 +46,7 @@ void Consumer::start() {
 int Consumer::cancel() {
 	// TODO: cancels the consumer thread (Done)
     is_cancel = true;
-    pthread_cancel(t);
+    return join();
 }
 
 void* Consumer::process(void* arg) {

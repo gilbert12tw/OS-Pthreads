@@ -50,7 +50,6 @@ void* Reader::process(void* arg) {
 		reader->ifs >> *item;
 		reader->input_queue->enqueue(item);
 	}
-
 	return nullptr;
 }
 

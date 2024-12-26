@@ -38,14 +38,14 @@ void Producer::start() {
 }
 
 void* Producer::process(void* arg) {
-	// TODO: implements the Producer's work (Not Done yet)
+	// TODO: implements the Producer's work (Done)
     Producer *producer = static_cast<Producer*>(arg);
     while (true) {
         Item *item = producer->input_queue->dequeue();
         item->val = producer->transformer->producer_transform(item->opcode, item->val);
         producer->worker_queue->enqueue(item);
-        // when to get out?
     }
+    return nullptr;
 }
 
 #endif // PRODUCER_HPP

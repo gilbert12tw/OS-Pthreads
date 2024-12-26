@@ -46,12 +46,13 @@ void Writer::start() {
 void* Writer::process(void* arg) {
 	// TODO: implements the Writer's work (Done)
     Writer *writer = static_cast<Writer*>(arg);
-    while (writer->expected_lines--) {
+    for (int i = 0; i < writer->expected_lines; i++) {
         Item *item = writer->output_queue->dequeue();
         writer->ofs << *item;
         delete item;
     }
     delete writer;
+    return nullptr;
 }
 
 #endif // WRITER_HPP

@@ -78,19 +78,17 @@ void* ConsumerController::process(void* arg) {
         int work_sz = consumerController->worker_queue->get_size();
         int consumers_sz = consumerController->consumers.size();
         if (work_sz > consumerController->high_threshold) {
+            printf("Scaling up consumers from %d to %d\n", consumers_sz, consumers_sz + 1);
             Consumer *new_consumer = new Consumer(consumerController->worker_queue,
                                                   consumerController->writer_queue,
                                                   consumerController->transformer);
             consumerController->consumers.emplace_back(new_consumer);
             new_consumer->start();
-            printf("Scaling up consumers from %d to %d\n", consumers_sz, consumers_sz + 1);
-        }
-        if (work_sz < consumerController->low_threshold && consumers_sz > 1) {
-            Consumer *del_consumer = consumerController->consumers.back();
-            consumerController->consumers.pop_back();
-            del_consumer->cancel();
-            delete del_consumer;
+        } else if (work_sz < consumerController->low_threshold && consumers_sz > 1) {
             printf("Scaling down consumers from %d to %d\n", consumers_sz, consumers_sz - 1);
+            Consumer *del_consumer = consumerController->consumers.back();
+            del_consumer->cancel();
+            consumerController->consumers.pop_back();
         }
         usleep(consumerController->check_period);
     }
