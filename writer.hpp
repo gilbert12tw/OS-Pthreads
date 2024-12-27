@@ -51,7 +51,6 @@ void* Writer::process(void* arg) {
         writer->ofs << *item;
         delete item;
     }
-    delete writer;
     return nullptr;
 }
 

@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 	std::string input_file_name(argv[2]);
 	std::string output_file_name(argv[3]);
 
-	// TODO: implements main function
+	// TODO: implements main function (Done)
     TSQueue<Item*> *input_queue = new TSQueue<Item*>(READER_QUEUE_SIZE);
     TSQueue<Item*> *worker_queue = new TSQueue<Item*>(WORKER_QUEUE_SIZE);
     TSQueue<Item*> *output_queue = new TSQueue<Item*>(WRITER_QUEUE_SIZE);
@@ -54,5 +54,15 @@ int main(int argc, char** argv) {
 
     reader->join();
     writer->join();
+
+    // delete
+    delete writer;
+    delete reader;
+    delete transformer;
+    delete consumerController;
+    delete input_queue;
+    delete worker_queue;
+    delete output_queue;
+
 	return 0;
 }
