@@ -122,7 +122,7 @@ We already provide 2 test cases. You can change and test other test cases by cha
 
 ### a. Implementation Correctness - 50%
 
-- Must implement this homework through the class we supplied.
+- Public testcases (20%): you can execute `./grade-pthread-public` to test your code.
 
 - Must use **Pthread library** to implement multi-thread programming.
 
@@ -145,7 +145,6 @@ We already provide 2 test cases. You can change and test other test cases by cha
   #define CONSUMER_CONTROLLER_CHECK_PERIOD 1000000
   ```
 
-  
 
 ### b. Experiment - 20%
 

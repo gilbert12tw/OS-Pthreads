@@ -1,58 +1,14 @@
-# Pthread Assignment Setup Guide
+# Pthread Assignment Guide
 
 This guide will help you set up your development environment for the pthread assignment using Docker. Since you've already completed the xv6 assignment, this guide focuses primarily on Docker-specific setup and workflows for this assignment.
 
-## Overview
+## Pthread Overview
 
 This assignment involves implementing multi-threaded programs using POSIX threads (pthreads) in C++. Unlike xv6, which required QEMU, this assignment runs natively in a containerized Linux environment using Docker.
 
-## Prerequisites
+## Pthread Directory Structure
 
-### Installing Docker Desktop
-
-Download and install Docker Desktop from [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/).
-
-**Important notes**:
-- **Windows**: Docker Desktop requires WSL 2 (Windows Subsystem for Linux). The installer will guide you through enabling it.
-- **Linux**: You may need to add your user to the docker group: `sudo usermod -aG docker $USER`, then log out and log back in.
-
-After installation, verify it works by running:
-```bash
-docker --version
-docker-compose --version
 ```
-
-## Repository Setup
-
-### 1. Clone the Repository
-
-Clone the shared pthread repository:
-
-```bash
-git clone https://git.lsalab.cs.nthu.edu.tw/os25/os25_shared_pthread.git pthread
-cd pthread
-```
-
-### 2. Configure Git Line Endings (Critical for Windows Users!)
-
-**Windows users MUST do this step** to avoid the error `/usr/bin/env: 'python3\r': No such file or directory`:
-
-```bash
-# For PowerShell/CMD
-git config core.autocrlf false
-git rm --cached -r .
-git reset --hard
-```
-
-macOS and Linux users should also run this to ensure consistency:
-
-```bash
-git config core.autocrlf false
-```
-
-### 3. Repository Structure
-
-```plain
 pthread/
 ├── Makefile                      # Build configuration
 ├── docker-compose.yml            # Docker setup
@@ -76,17 +32,64 @@ pthread/
     └── 01.ans                   # Test case 1 expected output
 ```
 
-## Working with Docker
+## Prerequisites
 
-### Understanding Docker Compose
+### Installing Docker Desktop
+
+Download and install Docker Desktop from [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/).
+
+**Important notes**:
+- **Windows**: Docker Desktop requires WSL 2 (Windows Subsystem for Linux). The installer will guide you through enabling it.
+- **Linux**: You may need to add your user to the docker group: `sudo usermod -aG docker $USER`, then log out and log back in.
+
+After installation, verify it works by running:
+```bash
+docker --version
+docker-compose --version
+```
+
+## Setting up your environment
+
+1. Clone the shared pthread repository:
+
+```bash
+git clone https://git.lsalab.cs.nthu.edu.tw/os25/os25_shared_pthread.git pthread
+```
+
+2. Navigate to the directory:
+
+```bash
+cd pthread
+```
+
+3. (Important! For Windows users) Configure Git to handle line endings correctly:
+
+```bash
+git config core.autocrlf false
+git rm --cached -r .
+git reset --hard
+```
+
+If you don't do this, you will probably encounter the error `/usr/bin/env: 'python3\r': No such file or directory` when running a script inside the Docker container.
+
+4. Now you can start working on the assignment. The template will provide you with the necessary files and structure to begin
+
+- Spec is in file `Pthread-spec.md`
+- Grading script is in `grade-mp1-public`(TBD)
+
+## How to run pthread
+
+### Run with Docker (Recommended)
 
 This repository includes a `docker-compose.yml` file that defines a pre-configured build environment. This ensures everyone has the same compilation environment regardless of their host operating system.
 
-### Using Docker Compose
+1. Clone the repository and navigate to the directory:
 
-#### Pull the Docker Image
+```bash
+cd <your-cloned-repo>
+```
 
-First, pull the required Docker image:
+2. Pull the built image:
 
 ```bash
 docker pull gcc:latest
@@ -94,23 +97,7 @@ docker pull gcc:latest
 
 **Note**: The repository is configured to use `gcc:latest` by default. If you prefer, you can modify `docker-compose.yml` to use other similar images like `dasbd72/xv6:amd64` or `dasbd72/xv6:arm64v8`.
 
-#### Build Your Code
-
-The Makefile includes a convenient `docker-build` target:
-
-```bash
-make docker-build
-```
-
-This command:
-1. Starts a Docker container with the correct build environment
-2. Mounts your current directory into the container
-3. Compiles your code using `make`
-4. Exits the container (built binaries remain in your directory)
-
-### Using Docker Compose Run (Alternative)
-
-You can also use `docker-compose` for running commands:
+3. Using `docker-compose`:
 
 ```bash
 # Build code
@@ -121,15 +108,17 @@ docker-compose run --rm build /bin/bash
 
 # Run a specific command inside the container
 docker-compose run --rm build ./main 200 tests/00.in output.txt
+
+# Verify output
+docker-compose run --rm build python3 scripts/verify.py --output output.txt --answer tests/00.ans
 ```
 
 ### Building Locally (Optional)
 
 If you prefer to build directly on your machine without Docker, ensure you have:
 
-- A C++ compiler supporting C++11 (g++ or clang++)
-- pthread library (usually included with your compiler)
-- Python 3 with the `click` library (`pip install click`)
+- A g++ compiler supporting C++11
+- pthread library
 
 Then simply run:
 
@@ -139,7 +128,7 @@ make
 
 **Note**: Building locally may produce different results due to environment differences. Docker is recommended for consistency with the grading environment.
 
-## Running Test Cases
+## How to run the grading scripts
 
 We provide two public test cases (00 and 01) and a verification script for you to test your implementation.
 
@@ -167,6 +156,12 @@ make docker-build
 ./main 4000 tests/01.in output.txt
 python3 scripts/verify.py --output output.txt --answer tests/01.ans
 ```
+
+For test case 01(docker-compose):
+
+// TODO add script here
+
+// and docker-compose command for test case
 
 ## Submission
 
@@ -201,34 +196,7 @@ Your team has been assigned a submission repository named `os<year>_team<team-id
 - The final commit before the deadline will be graded
 - Follow the general submission rules outlined in the xv6 guide
 
-## Troubleshooting
+## Plagiarism Policy
 
-### Common Issues
-
-#### 1. "docker: command not found"
-
-**Solution**: Docker is not installed or not in your PATH. Reinstall Docker Desktop and ensure it's running.
-
-#### 2. "Cannot connect to the Docker daemon"
-
-**Solution**:
-- Windows/macOS: Start Docker Desktop application
-- Linux: Start the Docker service: `sudo systemctl start docker`
-
-#### 3. "/usr/bin/env: 'python3\r': No such file or directory"
-
-**Solution**: This is a line ending issue on Windows. Run:
-```bash
-git config core.autocrlf false
-git rm --cached -r .
-git reset --hard
-```
-
-## Additional Resources
-
-- Docker Documentation: [https://docs.docker.com/](https://docs.docker.com/)
-- Docker Compose Documentation: [https://docs.docker.com/compose/](https://docs.docker.com/compose/)
-- POSIX Threads Tutorial: [https://hpc-tutorials.llnl.gov/posix/](https://hpc-tutorials.llnl.gov/posix/)
-- C++ Threading: [https://en.cppreference.com/w/cpp/thread](https://en.cppreference.com/w/cpp/thread)
-
-Good luck with your assignment!
+- Never show your code to others.
+- If your code is found to be similar to others, including sources from the internet, and you cannot answer questions properly about your code during the demo, you will be considered as plagiarizing and will receive a score of 0 for the assignment.
